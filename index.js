@@ -56,7 +56,7 @@ async function run() {
 
         // add a Order
         app.post('/orders', async (req, res) => {
-            console.log('body')
+            console.log('add Orders')
             const newOrder = req.body;
             console.log(newOrder);
             const result = await ordersCollection.insertOne(newOrder);
@@ -87,7 +87,7 @@ async function run() {
             console.log('body')
             const newUser = req.body;
             console.log(newUser);
-            const result = await usersCollection.insertOne({email: ''});
+            const result = await usersCollection.insertOne(newUser);
             console.log(result);
             res.json(result);
 
@@ -105,13 +105,30 @@ async function run() {
         });
 
         // Make Admin user
-        app.put('/makeAdmin', async (req, res) => {
+        app.put('/users/makeAdmin', async (req, res) => {
             const user = req.body;
             const filter = { email: user?.email };
             const updateDoc = { $set: { role: 'admin' } };
             const result = await usersCollection.updateOne(filter, updateDoc);
-           
             res.json(result);
+        });
+
+        // check if user is admin
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const result = await usersCollection.findOne(query);
+            let isAdmin = false;
+            if (result?.role === 'admin') {
+                isAdmin = true;
+            }
+            console.log(isAdmin);
+            res.send(isAdmin);
+        })
+
+        // add a Review 
+        app.get('/reviews', async (req, res) => {
+            
         })
 
     } catch {
