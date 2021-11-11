@@ -87,7 +87,7 @@ async function run() {
             console.log('body')
             const newUser = req.body;
             console.log(newUser);
-            const result = await usersCollection.insertOne(newUser);
+            const result = await usersCollection.insertOne({email: ''});
             console.log(result);
             res.json(result);
 
@@ -103,6 +103,16 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc, options);
             res.json(result);
         });
+
+        // Make Admin user
+        app.put('/makeAdmin', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user?.email };
+            const updateDoc = { $set: { role: 'admin' } };
+            const result = await usersCollection.updateOne(filter, updateDoc);
+           
+            res.json(result);
+        })
 
     } catch {
 
