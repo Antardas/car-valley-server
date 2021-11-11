@@ -22,6 +22,7 @@ async function run() {
         const database = client.db('car-valley');
         const productsCollection = database.collection('products');
         const ordersCollection = database.collection('orders');
+        const usersCollection = database.collection('users');
 
         // Get All products
         app.get('/products', async (req, res) => {
@@ -49,9 +50,9 @@ async function run() {
         })
 
         // Remove specific products
-/*         app.delete('/products/:id', (req, res) => {
-
-        }); */
+        /*         app.delete('/products/:id', (req, res) => {
+        
+                }); */
 
         // add a Order
         app.post('/orders', async (req, res) => {
@@ -81,13 +82,27 @@ async function run() {
             res.json(result);
         });
 
+        // add user
+        app.post('/users', async (req, res) => {
+            console.log('body')
+            const newUser = req.body;
+            console.log(newUser);
+            const result = await usersCollection.insertOne(newUser);
+            console.log(result);
+            res.json(result);
 
+        });
 
-
-
-
-
-
+        // Check if user exists or does not exist Add user if user does not exist
+        app.put('/users', async(req, res) => {
+            console.log('update user')
+            const user = req.body
+            const filter = { email: user?.email };
+            const updateDoc = { $set: user };
+            const options = { upsert: true };
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.json(result);
+        });
 
     } catch {
 
