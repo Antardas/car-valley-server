@@ -23,6 +23,7 @@ async function run() {
         const productsCollection = database.collection('products');
         const ordersCollection = database.collection('orders');
         const usersCollection = database.collection('users');
+        const userReviewsCollection = database.collection('userReviews');
 
         // Get All products
         app.get('/products', async (req, res) => {
@@ -94,7 +95,7 @@ async function run() {
         });
 
         // Check if user exists or does not exist Add user if user does not exist
-        app.put('/users', async(req, res) => {
+        app.put('/users', async (req, res) => {
             console.log('update user')
             const user = req.body
             const filter = { email: user?.email };
@@ -127,9 +128,46 @@ async function run() {
         })
 
         // add a Review 
-        app.get('/reviews', async (req, res) => {
-            
+        app.post('/reviews', async (req, res) => {
+            console.log('add review');
+            const review = req.body;
+            const result = await userReviewsCollection.insertOne(review);
+            console.log(result);
+            res.json(result);
         })
+
+        // get all Review
+        app.get('/reviews', async (req, res) => {
+            console.log('get all reviews');
+            const result = await userReviewsCollection.find({}).toArray();
+            console.log(result);
+            res.json(result);
+        });
+
+        // shiped order
+        app.put('/orders/:id', async (req, res) => {
+            console.log('shiped order');
+            const id = req.params.id;
+
+            const query = { _id: objectId(id) };
+            const updateDoc = { $set: { status: 'shipped' } };
+            const result = await ordersCollection.updateOne(query, updateDoc);
+            console.log(result);
+            res.json('result');
+        });
+
+        // Delete order
+        app.delete('/orders/:id', async (req, res) => {
+            console.log('delete order');
+            const id = req.params.id;
+            const query = { _id: objectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            console.log(result);
+            res.json(result);
+        });
+        
+
+
 
     } catch {
 
